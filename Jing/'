@@ -1,0 +1,31 @@
+#include <stdio.h>
+
+
+int main()
+{
+	char filename="/data/s6/data_Jing/6411/simu/pos6411.0221"
+	fd=fopen(filenmame,"r")
+
+	int dummy;
+	fread(&dummy,sizeof(dummy),1,fd);
+	char a[4];
+	fread(a,sizeof(a),fd);
+	int b;
+	b=int(a);
+	b=UINTSWAP(b);
+	printf("%d\n",b);
+	return 0;
+
+
+
+
+}
+unsigned int UINTSWAP(int x)
+{
+	return \
+	(x&0xff000000)>>24|\
+	(x&0x00ff0000)>>8|\
+	(x&0x0000ff00)<<8|\
+	(x&0x000000ff)<<24;
+}
+
