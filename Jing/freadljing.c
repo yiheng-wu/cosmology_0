@@ -2,32 +2,21 @@
 #include <stdlib.h>
 #include <string.h>
 #include <math.h>
+#include <time.h>
+#include <inttypes.h>
 
-#define NGRID 3000
+#define BOXSIZE 1200
+#define NP 28991029248
+#define NGRID 1200
+#define timed_output(...) {print_time(); fprintf(stderr, __VA_ARGS__);}
+void print_time(void)
+{
+	int64_t time_now=time(NULL);
+	fprintf(stderr,"[%6"PRId64"s]",time_now);
+}
+
 int pro_data[NGRID][NGRID];
 
-//int大小端转换
-unsigned int UISWAP(int x)
-{
-	return \
-	(x&0xff000000)>>24|\
-	(x&0x00ff0000)>>8|\
-	(x&0x0000ff00)<<8|\
-	(x&0x000000ff)<<24;
-}
-//64位int大小端转换
-int64_t LISWAP(int64_t x)
-{
-	int l,h;
-	int64_t t;
-	l=x&0xFFFFFFFF;
-	h=(x>>32)&0xFFFFFFFF;
-
-	t=UISWAP(l);
-
-	return (t<<32)|UISWAP(h);
-}
-//float大小端转换
 typedef union FLOAT_CHAR
 {
 	float f;
@@ -44,18 +33,17 @@ float FSWAP(float x)
 	return f2.f;
 }
 
-
-struct header_jing
+struct header_ljing
 {
-	int np;
-	int ips;
+	int64_t np;
+	int64_t ips;
 	float ztp;
 	float omegat;
 	float lamdat;
 	float boxsize;
 	float xscale;
 	float vscale;
-}	header0;
+}	headerl;
 
 struct particle_data
 {
@@ -65,16 +53,27 @@ struct particle_data
 
 int main(int argc, char **argv)
 {
-	char *f="/data/s6/data_Jing/6411/simu/pos6411.0600";
-	initial_profile();
-	load_jing(f);
+	char *f1="/data/s1/simu/Jing6620/pos6620.5000.01";
+	char *f2="/data/s1/simu/Jing6620/pos6620.5000.02";
+	char *f3="/data/s1/simu/Jing6620/pos6620.5000.03";
+	char *f4="/data/s1/simu/Jing6620/pos6620.5000.04";
 
+	allocate_memory(NP/4);
+	initial_profile();
+	load_ljing(f1);
 	profile();
+	load_ljing(f2);
+	profile();
+	load_ljing(f3);
+	profile();
+	load_ljing(f4);
+	profile();
+	slice();	
 	
 	return 0;
 }
 
-int load_jing(char *fname)
+int load_ljing(char *fname)
 {
 	FILE *fd;
 	unsigned int dummy;
@@ -88,38 +87,27 @@ int load_jing(char *fname)
 	}
 
 	SKIP;
-	fprintf(stderr,"SKIP=%d\n",UISWAP(dummy));
-	fread(&header0, sizeof(header0),1,fd);
-	SKIP;
-	fprintf(stderr,"SKIP=%d\n",UISWAP(dummy));
-	//Jing类型需要做大小端转换，LJing不需要转换
-	header0.np=UISWAP(header0.np);
-	header0.ips=UISWAP(header0.ips);
-	header0.ztp=FSWAP(header0.ztp);
-	header0.omegat=FSWAP(header0.omegat);
-	header0.lamdat=FSWAP(header0.lamdat);
-	header0.boxsize=FSWAP(header0.boxsize);
-	header0.xscale=FSWAP(header0.xscale);
-	header0.vscale=FSWAP(header0.vscale);
-	printf("%ld\n",header0.np);
-	printf("%ld\n",header0.ips);
-	printf("%f\n",header0.ztp);
-	printf("%f\n",header0.omegat);
-	printf("%f\n",header0.lamdat);
-	printf("%f\n",header0.boxsize);
-	allocate_memory(header0.np);
+	if (dummy==40)
+	{
+		fread(&headerl, sizeof(headerl),1,fd);
+		SKIP;
+		SKIP;
+	}
+	else 
+	{
+		headerl.boxsize=BOXSIZE;
+		headerl.np=NP;
+	}
 
-	SKIP;
-	fprintf(stderr,"SKIP=%d\n",UISWAP(dummy));
-	int np;
+	int64_t np;
 	float tem;
 	int64_t N_b=0;//读取的字节数
 	int64_t N0=2147483639;//fortran单块字节数
 	int xyz;
 
-	for(xyz=0;xyz<3;xyz++)
+	for(np=0;np<headerl.np/4;np++)
 	{
-		for(np=0;np<header0.np;np++)
+		for(xyz=0;xyz<3;xyz++)
 		{
 			fread(&tem,sizeof(tem),1,fd);
 			P[np].Pos[xyz]=FSWAP(tem);
@@ -131,12 +119,10 @@ int load_jing(char *fname)
 				fread(&joint.c[1],1,1,fd);
 				fread(&joint.c[2],1,1,fd);
 				SKIP;
-	fprintf(stderr,"SKIP=%d\n",UISWAP(dummy));
 				SKIP;
-	fprintf(stderr,"SKIP=%d\n",UISWAP(dummy));
 				fread(&joint.c[3],1,1,fd);
-				P[np+1].Pos[xyz]=FSWAP(joint.f);
-				np++;
+				P[np].Pos[2]=FSWAP(joint.f);
+				xyz++;
 				N_b+=4;
 			}
 			else if(N_b==N0*2-2)
@@ -145,13 +131,11 @@ int load_jing(char *fname)
 				fread(&joint.c[0],1,1,fd);
 				fread(&joint.c[1],1,1,fd);
 				SKIP;
-	fprintf(stderr,"SKIP=%d\n",UISWAP(dummy));
 				SKIP;
-	fprintf(stderr,"SKIP=%d\n",UISWAP(dummy));
 				fread(&joint.c[2],1,1,fd);
 				fread(&joint.c[3],1,1,fd);
-				P[np+1].Pos[xyz]=FSWAP(joint.f);
-				np++;
+				P[np].Pos[2]=FSWAP(joint.f);
+				xyz++;
 				N_b+=4;
 			}
 			else if(N_b==N0*3-1)
@@ -159,22 +143,18 @@ int load_jing(char *fname)
 				float_char joint;
 				fread(&joint.c[0],1,1,fd);
 				SKIP;
-	fprintf(stderr,"SKIP=%d\n",UISWAP(dummy));
 				SKIP;
-	fprintf(stderr,"SKIP=%d\n",UISWAP(dummy));
 				fread(&joint.c[1],1,1,fd);
 				fread(&joint.c[2],1,1,fd);
 				fread(&joint.c[3],1,1,fd);
-				P[np+1].Pos[xyz]=FSWAP(joint.f);
-				np++;
+				P[np].Pos[2]=FSWAP(joint.f);
+				xyz++;
 				N_b+=4;
 			}
 			else if(N_b==N0*4)
 			{
 				SKIP;
-	fprintf(stderr,"SKIP=%d\n",UISWAP(dummy));
 				SKIP;
-	fprintf(stderr,"SKIP=%d\n",UISWAP(dummy));
 				N_b=0;
 			}
 		}
@@ -196,7 +176,6 @@ int allocate_memory(int64_t np)
 
   printf("allocating memory...done\n");
 }
-
 int initial_profile(void)
 {
 	int i,j;
@@ -210,14 +189,19 @@ int initial_profile(void)
 }
 int profile(void)
 {
-	int i,j;
-	for(i=0;i<header0.np;i++)
+	int64_t i;
+	
+	for(i=0;i<headerl.np/4;i++)
 	{
-		if (P[i].Pos[0]>0.5 && P[i].Pos[0]<0.5005)
+		if (P[i].Pos[0]>0.5 && P[i].Pos[0]<0.5+0.5/headerl.boxsize)
 		{
 			pro_data[(int)(P[i].Pos[1]*NGRID)][(int)(P[i].Pos[2]*NGRID)]+=1;
 		}
 	}
+}
+int slice(void)
+{
+	int64_t i,j;
 	FILE *new=fopen("/data/s5/yhwu/data/SLICE","w");
 	int64_t All=0;
 	for(i=0;i<NGRID;i++)

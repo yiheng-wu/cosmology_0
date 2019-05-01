@@ -15,7 +15,7 @@ void print_time(void)
 	fprintf(stderr,"[%6"PRId64"s]",time_now);
 }
 
-int pro_data[NGRID+1][NGRID+1];
+int pro_data[NGRID][NGRID];
 
 typedef union FLOAT_CHAR
 {
@@ -55,12 +55,16 @@ int main(int argc, char **argv)
 	allocate_memory(NP/4);
 	initial_profile();
 	load_ljing(f1);
+	print_z();
 	profile();
 	load_ljing(f2);
+	print_z();
 	profile();
 	load_ljing(f3);
+	print_z();
 	profile();
 	load_ljing(f4);
+	print_z();
 	profile();
 	slice();	
 	
@@ -103,6 +107,7 @@ int load_ljing(char *fname)
 	int64_t N_b=0;//读取的字节数
 	int64_t N0=2147483639;//fortran单块字节数
 	int xyz;
+
 	for(np=0;np<headerl.np/4;np++)
 	{
 		for(xyz=0;xyz<3;xyz++)
@@ -119,9 +124,8 @@ int load_ljing(char *fname)
 				SKIP;
 				SKIP;
 				fread(&joint.c[3],1,1,fd);
-				if(xyz<2) xyz++;
-				else xyz=0,np++;
-				P[np].Pos[xyz]=joint.f*headerl.boxsize;
+				P[np].Pos[2]=joint.f*headerl.boxsize;
+				xyz++;
 				N_b+=4;
 			}
 			else if(N_b==N0*2-2)
@@ -133,9 +137,8 @@ int load_ljing(char *fname)
 				SKIP;
 				fread(&joint.c[2],1,1,fd);
 				fread(&joint.c[3],1,1,fd);
-				if(xyz<2) xyz++;
-				else xyz=0,np++;
-				P[np].Pos[xyz]=joint.f*headerl.boxsize;
+				P[np].Pos[2]=joint.f*headerl.boxsize;
+				xyz++;
 				N_b+=4;
 			}
 			else if(N_b==N0*3-1)
@@ -147,9 +150,8 @@ int load_ljing(char *fname)
 				fread(&joint.c[1],1,1,fd);
 				fread(&joint.c[2],1,1,fd);
 				fread(&joint.c[3],1,1,fd);
-				if(xyz<2) xyz++;
-				else xyz=0,np++;
-				P[np].Pos[xyz]=joint.f*headerl.boxsize;
+				P[np].Pos[2]=joint.f*headerl.boxsize;
+				xyz++;
 				N_b+=4;
 			}
 			else if(N_b==N0*4)
@@ -180,9 +182,9 @@ int allocate_memory(int64_t np)
 int initial_profile(void)
 {
 	int i,j;
-	for(i=0;i<NGRID+1;i++)
+	for(i=0;i<NGRID;i++)
 	{
-		for(j=0;j<NGRID+1;j++)
+		for(j=0;j<NGRID;j++)
 		{
 			pro_data[i][j]=0;
 		}
@@ -194,7 +196,7 @@ int profile(void)
 	
 	for(i=0;i<headerl.np/4;i++)
 	{
-		if (P[i].Pos[0]>0.5*headerl.boxsize && P[i].Pos[0]<0.5+0.5*headerl.boxsize)
+		if (P[i].Pos[0]>0.5*headerl.boxsize && P[i].Pos[0]<100+0.5*headerl.boxsize)
 		{
 			pro_data[(int)(P[i].Pos[1]*NGRID/headerl.boxsize)][(int)(P[i].Pos[2]*NGRID/headerl.boxsize)]+=1;
 		}
