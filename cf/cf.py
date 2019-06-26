@@ -2,9 +2,9 @@
 import numpy as np
 import time
 import math
-#import matplotlib
-#matplotlib.use('Agg')
-#import matplotlib.pyplot as plt
+import matplotlib
+matplotlib.use('Agg')
+import matplotlib.pyplot as plt
 from concurrent.futures import ProcessPoolExecutor
 import MyLib as ml
 import ReadSnap as rs

@@ -144,7 +144,7 @@ def read_data(snapshot):
     # in case any of them is present, send a warning.
     chunk = snapshot.read()
     if chunk:
-        print "There still were things to be read..."
+        print ("There still were things to be read...")
     return p_list
 
 #An example of simple application of the script.

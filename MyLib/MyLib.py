@@ -17,7 +17,7 @@ def Create_Partition(m_max,m_min,radix=1.1):
 	elif m_min>0:
 		base=m_min
 	else:
-		print "MyLib_Create_Partition error, m_min>0"
+		print ("MyLib_Create_Partition error, m_min>0")
 		sys.exit()
 	index_max=int(math.log(m_max/base,radix))+1
 	if m_min==0:

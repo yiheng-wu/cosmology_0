@@ -74,6 +74,18 @@ def out_mass(name):
 	read.close()
 	return halo
 
+def hlist_mass(name):
+	read=open(name)
+	for i in range(0,57):
+		useless=read.readline()
+	halo=[]
+	line=read.readline()
+	while line:
+		data=line.split()
+		halo.append(float(data[10]))
+		line=read.readline()
+	read.close()
+	return halo
 
 def get_names(name,n):
 	names=[]
@@ -81,6 +93,28 @@ def get_names(name,n):
 		strn=str(i)
 		names.append(name+strn+".ascii")
 	return names
+
+
+
+hlist_name="/data/s5/yhwu/ELUCID/tree/hlists/hlist_1.00000.list"
+out_name="/data/s5/yhwu/ELUCID/halo_catalogue/out_100.list"
+
+box=500
+
+hlist=hlist_mass(hlist_name)
+out=out_mass(out_name)
+
+h=sim_hmf(hlist,box)
+o=sim_hmf(out,box)
+plt.plot(h[0],h[1])
+plt.plot(o[0],o[1])
+plt.loglog()
+plt.savefig("/home/yhwu/pic/hlist_out.png")
+quit()
+
+
+
+
 
 
 
