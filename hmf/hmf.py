@@ -11,7 +11,7 @@ from concurrent.futures import ProcessPoolExecutor
 #记得改变box的g大小
 def sim_hmf(mass,box):
 	#volume
-	sim_volum = box**3
+	sim_volum = 1.0*box**3
 	#sorted mass
 	masses_sim = np.sort(mass)
 	#0,1,2...len(mass)
@@ -21,8 +21,6 @@ def sim_hmf(mass,box):
 	#
 	n_cumulative_sim = n_cumulative_sim[unique_indices]/sim_volum
 	hmf = np.vstack((masses_sim,n_cumulative_sim))
-	print (len(mass))
-	print (len(unique_indices))
 
 	return hmf
 
@@ -97,19 +95,26 @@ def get_names(name,n):
 
 
 hlist_name="/data/s5/yhwu/ELUCID/tree/hlists/hlist_1.00000.list"
-out_name="/data/s5/yhwu/ELUCID/halo_catalogue/out_100.list"
+elucid_name="/data/s5/yhwu/ELUCID/halo_catalogue/out_100.list"
+tng_name="/data/s5/yhwu/data/TNG/halo/out_99.list"
 
-box=500
+box_e=500
+box_t=75
 
-hlist=hlist_mass(hlist_name)
-out=out_mass(out_name)
+#hlist=hlist_mass(hlist_name)
+#e_halo=out_mass(elucid_name)
+t_halo=out_mass(tng_name)
 
-h=sim_hmf(hlist,box)
-o=sim_hmf(out,box)
-plt.plot(h[0],h[1])
-plt.plot(o[0],o[1])
+#e=sim_hmf(e_halo,box_e)
+t=sim_hmf(t_halo,box_t)
+#np.save("/home/yhwu/pic/elucid",e)
+np.save("/home/yhwu/pic/tng",t)
+
+
+#plt.plot(e[0],e[1])
+plt.plot(t[0],t[1])
 plt.loglog()
-plt.savefig("/home/yhwu/pic/hlist_out.png")
+plt.savefig("/home/yhwu/pic/hmf_compare.png")
 quit()
 
 

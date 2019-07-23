@@ -1,0 +1,77 @@
+fields                  formats                 origins                 units                   descriptions            
+------------------------------------------------------------------------------------------------------------------------
+RA                      float64                 DECaLS                  degrees                 The right ascension in J2000 coordinates
+DEC                     float64                 DECaLS                  degrees                 The declination in J2000 coordinates
+Z                       float64                 redrock                                         The best estimate of the redshift
+WEIGHT_SYSTOT           float64                                                                 Photometric systematic weight
+WEIGHT_CP               float64                                                                 Close pair weight       
+WEIGHT_NOZ              float64                                                                 Redshift failure weight 
+NZ                      float64                                         (h/Mpc)^3               Comoving object density 
+WEIGHT_FKP              float64                                                                 FKP weight = 1/(1+NZ*P0), assumes P0 = 4000 (Mpc/h)^3
+sector_TSR              float64                                                                 Sector redshift completeness (total targets with a valid fiber)/(total targets)
+COMP_BOSS               float64                                                                 Sector BOSS completeness (total targets with a valid fiber + close pairs)/(total targets)
+plate_MJD_SSR           float64                                                                 Plate redshift completeness (number of good redshifts with SPECTYPE != "STAR")/(number of valid fibers with SPECTYPE != "STAR") for a given PLATE-MJD
+sector_SSR              float64                                                                 Sector redshift completeness (number of good redshifts with SPECTYPE != "STAR")/(number of valid fibers with SPECTYPE != "STAR")
+chunk                   char[7]                                                                 Tiling chunk (target selection can change between chunks)
+plate                   int32                   spZbest                                         ID of plate used for spectroscopic observation
+tile                    int32                   spZbest                                         ID of tile used for spectroscopic observation
+MJD                     int32                   spZbest                                         MJD of the related spZbest file
+sector                  int32                   tiling                                          Geometric region defined by the unique set of covering plates, from original chunk (different chunks can repeat sector numbers)
+ELG_sector              int32                                                                   Geometric region defined by the unique set of covering plates, format CCXXX with CC = CHUNK(21,22,23,25), XXX = SECTOR
+sector_area             float64                 tiling                  degrees^2               Sector area             
+sector_ntiles           int16                   tiling                                          Number of tiles in the sector
+sector_tiles            int16[4]                tiling                                          Tiles in the sector     
+INGROUP                 int32                   tiling                                          ID of collision group   
+ELG_INGROUP             int32                                                                   ID of collision group, format CCXXXXX with CC = CHUNK(21,22,23,25), XXXXX = INGROUP
+MULTGROUP               int32                   tiling                                          Cardinal of collision group
+EBOSS_TARGET1           int64                   tiling                                          Target selection flag. See: http://www.sdss.org/dr14/algorithms/bitmasks/#EBOSS_TARGET1
+BOSSTILE_STATUS         int32                   tiling                                          BOSS tiling code status bits. See: http://www.sdss.org/dr14/algorithms/bitmasks/#BOSSTILE_STATUS
+TRIMMED                 int32                   tiling                                                                  
+brickname               char[8]                 DECaLS                                          DECaLS of brickname, encoding the brick sky position, eg "1126p222" at RA = 112.6, Dec = +22.2
+decals_objid            int32                   DECaLS                                          DECaLS object ID (unique per brick)
+decals_uniqid           char[27]                                                                Unique DECaLS object ID: dr/brickname/objid
+decals_dr               char[20]                DECaLS                                          DECaLS Tractor version used for processing the brick
+type                    char[5]                 DECaLS                                          Morphological model: "PSF" = stellar, "REX" = "round exponential galaxy" = 0.45" round EXP galaxy, "DEV" = deVauc, "EXP" = exponential, "COMP" = composite
+nobs_g                  int32                   DECaLS                                          Number of observations in g-band
+nobs_r                  int32                   DECaLS                                          Number of observations in r-band
+nobs_z                  int32                   DECaLS                                          Number of observations in z-band
+psfdepth_g              float64                 DECaLS                  nanomaggies^-2          g-band depth for psf profile
+psfdepth_r              float64                 DECaLS                  nanomaggies^-2          r-band depth for psf profile
+psfdepth_z              float64                 DECaLS                  nanomaggies^-2          z-band depth for psf profile
+galdepth_g              float64                 DECaLS                  nanomaggies^-2          g-band depth for galaxy profile
+galdepth_r              float64                 DECaLS                  nanomaggies^-2          r-band depth for galaxy profile
+galdepth_z              float64                 DECaLS                  nanomaggies^-2          z-band depth for galaxy profile
+psfsize_g               float64                 DECaLS                  arsec                   DECaLS g-band psf size  
+psfsize_r               float64                 DECaLS                  arsec                   DECaLS r-band psf size  
+psfsize_z               float64                 DECaLS                  arsec                   DECaLS z-band psf size  
+g                       float64                                         nanommaggies            Extinction-corrected g-band
+gr                      float64                                         nanommaggies            Extinction-corrected g-r color (AB)
+rz                      float64                                         nanommaggies            Extinction-corrected r-z color (AB)
+IMATCH                  int16                                                                   Object classification. See: https://trac.sdss.org/wiki/eBOSS/QGC/LSScats/DR16
+EBOSS_TARGET_ID         int64                   spPlate                                         Unique object ID        
+hasfiber                int16                                                                   0: not observed, 1: valid fiber, -1: invalid fiber
+CARTID                  int32                   spPlate                                         The cartridge used in this plugging
+XFOCAL                  float64                 spPlate                 millimeters             E-W position of fiber on plate
+YFOCAL                  float64                 spPlate                 millimeters             N-S position of fiber on plate
+FIBERID                 int32                   spZbest                                         ID of spectrograph fiber used for observation
+PLUG_RA                 float64                 spZbest                 degrees                 The fiber right ascension in J2000 coordinates
+PLUG_DEC                float64                 spZbest                 degrees                 The fiber declination in J2000 coordinates
+plate_rSN2              float64                                                                 Signal to noise of the plate (estimated on the fly at the mountain)
+SN_MEDIAN               float64[5]              spZbest                                         Median S/N for all good pixels in each of the 5 SDSS filters
+SN_MEDIAN_ALL           float64                 spZbest                                         Median S/N for all good pixels in all filters
+plate_MJD_SN_MEDIAN_ALL float64                                                                 Median SN_MEDIAN_ALL for a given PLATE-MJD
+Z_ok                    bool                                                                    Z_ok == True to select redrock reliable redshifts. (ZWARN == 0) & (coeff[:,0] > 0) & ((SN_MEDIAN[:,3] > 0.5) | (SN_MEDIAN[:,4] > 0.5)) & (zQ != 0 | zCont != 1)
+CHI2                    float64                 redrock                                         chi^2 for best fit      
+DELTACHI2               float64                 redrock                                         delta chi^2 between the best fit and second minimum
+COEFF                   float64[10]             redrock                                         Coefficients of the fit. coeff[0] = archetype, coeff[1:] = Legendre polynomial
+ZERR                    float64                 redrock                                         Error on the redshift   
+ZWARN                   int64                   redrock                                         Warnings for SDSS spectra. See: http://www.sdss.org/dr14/algorithms/bitmasks/#ZWARNING
+NPIXELS                 int64                   redrock                                         Number of valid pixels (ivar > 0 & and_mask = 0)
+SPECTYPE                char[6]                 redrock                                         Object type given by best spectrum template: GALAXY, STAR or QSO
+SUBTYPE                 char[6]                 redrock                                         Object subtype given by best spectrum template: GALAXY, STAR or QSO
+NCOEFF                  int64                   redrock                                         Number of coefficients used in the fit
+fast_id                 int32                   FAST                                            Identifier in the FAST files. See: http://w.astro.berkeley.edu/~mariska/FAST.html and Kriek et al. 2009 arXiv:0905.1692v2
+fast_z                  float64                 FAST                                            grzW1W2-SED             
+fast_lmass              float64                 FAST                    solar unit              log10 of the FAST fitted stellar mass (solar units; Chabrier IMF) i.e. log10(Mstar / Msun)
+centerpost              bool                                                                    centerpost = False to remove centerposts
+MODEL_Z                 float64                                                                 Redshift model to account for the redshift dependence in photometric parameters (galdepth in g, r, z bands)

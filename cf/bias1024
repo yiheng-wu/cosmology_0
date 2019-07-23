@@ -1,0 +1,9 @@
+Begin: 2019-06-05 23:35:43
+Traceback (most recent call last):
+  File "cff.py", line 254, in <module>
+    bmg()
+  File "cff.py", line 208, in bmg
+    bx,by=bias(dm_dir,gas_dir)
+  File "cff.py", line 133, in bias
+    x=x*2*math.pi/L
+TypeError: can't multiply sequence by non-int of type 'float'
